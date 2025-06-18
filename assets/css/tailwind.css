@@ -197,7 +197,7 @@
 
 @font-face {
   font-family: LXGWWenKai;
-  src: url('/font/LXGWWenKai-Light.ttf') format('truetype');
+  src: url('/font/LXGWWenKai-Light.woff2') format('truetype');
 }
 
 html, body, #__nuxt {
