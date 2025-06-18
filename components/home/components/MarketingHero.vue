@@ -26,9 +26,12 @@
       一次加入，终身学习
     </p>
     <div class="mt-10 flex justify-center items-center gap-x-4">
-      <Button class="text-sm px-8 py-6" @click="onStartClick">
-        开始学习
-      </Button>
+      <NuxtLink to="/courses">
+        <Button class="text-sm px-8 py-6">
+          开始学习
+        </Button>
+      </NuxtLink>
+      
       <Button
         variant="outline"
         class="text-sm px-8 py-6 border border-primary text-primary hover:bg-primary/10 hover:text-primary"

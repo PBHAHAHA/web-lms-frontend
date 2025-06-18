@@ -67,7 +67,7 @@ const brandList = [
     src: "https://nuxt.com/",
   },
   {
-    imageSrc: "/images/Java.png",
+    imageSrc: "/images/java.png",
     name: "Java",
     src: "https://www.java.com/",
   },
