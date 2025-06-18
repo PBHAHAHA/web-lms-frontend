@@ -28,14 +28,26 @@
       <p class="text-muted-foreground text-sm mb-4">{{ course.description }}</p>
     </template>
     <Skeleton v-else class="h-4 w-full mb-4" />
-    
+    <div class="flex flex-wrap gap-2 mb-4">
+      <!-- <Badge v-if="course.level" variant="secondary" class="text-xs">
+        {{ course.level }}
+      </Badge>
+      <Badge v-if="course.category" variant="outline" class="text-xs">
+        {{ course.category }}
+      </Badge>
+      <Badge v-if="course.duration" variant="secondary" class="text-xs">
+        {{ course.duration }}
+      </Badge> -->
+      <Badge v-if="course.tags" v-for="tag in course.tags" :key="tag" variant="outline" class="text-xs">
+        {{ tag }}
+      </Badge>
+    </div>
     <div class="flex items-center justify-between">
-      <template v-if="course.price !== undefined">
-        <span class="text-primary font-medium">¥{{ course.price }}</span>
-      </template>
-      <Skeleton v-else class="h-5 w-16" />
-      
-      <Button size="sm" @click="viewCourse(course.id)">查看详情</Button>
+      <div></div>
+      <NuxtLink :to="`/courses/catelog/${course.id}`" class="inline-block">
+        <!-- <Button size="sm">查看详情</Button> -->
+        <Button size="sm">开始学习</Button>
+      </NuxtLink>
     </div>
   </div>
 </template>
@@ -43,6 +55,7 @@
 <script setup>
 import { ref } from 'vue';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
 
 const props = defineProps({
   course: {
@@ -55,9 +68,5 @@ const imageError = ref(false);
 
 const handleImageError = () => {
   imageError.value = true;
-};
-
-const viewCourse = (courseId) => {
-  // 这里需要实现查看课程详情的逻辑
 };
 </script>

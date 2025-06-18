@@ -46,7 +46,7 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  
+
   /* Custom shadows */
   --shadow-sm: 0 2px 8px 0 rgb(0 0 0 / 0.025), 0 0 1px rgb(0 0 0 / 0.1);
   --shadow: 0 4px 16px 0 rgb(0 0 0 / 0.05), 0 0 1px rgb(0 0 0 / 0.1);
@@ -54,13 +54,29 @@
   --shadow-lg: 0 8px 32px 0 rgb(0 0 0 / 0.1), 0 0 1px rgb(0 0 0 / 0.1);
   --shadow-xl: 0 12px 48px 0 rgb(0 0 0 / 0.125), 0 0 1px rgb(0 0 0 / 0.1);
   --shadow-2xl: 0 16px 64px 0 rgb(0 0 0 / 0.15), 0 0 1px rgb(0 0 0 / 0.1);
-  
+
   /* Font family */
   --font-family-sans: Poppins, sans-serif;
-  
+
   /* Animations */
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
+  @keyframes accordion-down {
+  from {
+    height: 0;
+    }
+  to {
+    height: var(--reka-accordion-content-height);
+    }
+  }
+  @keyframes accordion-up {
+  from {
+    height: var(--reka-accordion-content-height);
+    }
+  to {
+    height: 0;
+    }
+  }
 }
 
 :root {
@@ -179,7 +195,6 @@
   @apply max-w-7xl mx-auto px-4;
 }
 
-
 @font-face {
   font-family: LXGWWenKai;
   src: url('/font/LXGWWenKai-Light.ttf') format('truetype');
@@ -189,4 +204,13 @@ html, body, #__nuxt {
   /* height: 100%;
   width: 100%; */
   font-family: "LXGWWenKai", "Microsoft YaHei",  sans-serif;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }

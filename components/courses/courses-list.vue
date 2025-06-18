@@ -28,24 +28,59 @@ const courses = ref([
     title: "全栈开发入门",
     description: "学习前端和后端开发的基础知识，包括HTML、CSS、JavaScript和Node.js",
     price: 299,
-    image: "/images/courses/fullstack-basics.jpg",
-    featured: true
+    image: "/images/javamain.png",
+    featured: true,
+    level: "初级",
+    category: "全栈开发",
+    duration: "10小时",
+    tags: ["HTML", "CSS", "JavaScript", "Node.js"]
   },
   {
     id: 2,
     title: "Vue.js 3 实战",
     description: "深入学习Vue 3的新特性，包括Composition API、响应式系统等",
     price: 399,
-    image: "/images/courses/vue3-advanced.jpg",
-    featured: false
+    image: "/images/javamain.png",
+    featured: false,
+    level: "中级",
+    category: "前端开发",
+    duration: "10小时",
+    tags: ["Vue.js", "Composition API", "响应式系统"]
   },
   {
     id: 3,
     title: "Node.js与Express框架",
     description: "使用Node.js和Express构建高性能的Web应用和API",
     price: 349,
-    image: "/images/courses/nodejs-express.jpg",
-    featured: false
+    image: "/images/javamain.png",
+    featured: false,
+    level: "高级",
+    category: "后端开发",
+    duration: "10小时",
+    tags: ["Node.js", "Express", "API"]
+  },
+  {
+    id: 3,
+    title: "Node.js与Express框架",
+    description: "使用Node.js和Express构建高性能的Web应用和API",
+    price: 349,
+    image: "/images/javamain.png",
+    featured: false,
+    level: "高级",
+    category: "后端开发",
+    duration: "10小时",
+    tags: ["Node.js", "Express", "API"]
+  },  {
+    id: 3,
+    title: "Node.js与Express框架",
+    description: "使用Node.js和Express构建高性能的Web应用和API",
+    price: 349,
+    image: "/images/javamain.png",
+    featured: false,
+    level: "高级",
+    category: "后端开发",
+    duration: "10小时",
+    tags: ["Node.js", "Express", "API"]
   }
 ]);
 

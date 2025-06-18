@@ -35,7 +35,7 @@
 
         <div class="flex flex-1 items-center justify-end gap-2">
           <ClientOnly>
-            <ColorModeToggle />
+            <!-- <ColorModeToggle /> -->
           </ClientOnly>
           <ClientOnly>
             <Sheet>
@@ -92,6 +92,7 @@
 
 <script setup>
 import Logo from './Logo.vue';
+import { LucideMenu } from 'lucide-vue-next';
 </script>
 
 
