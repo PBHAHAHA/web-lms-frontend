@@ -1,11 +1,11 @@
 <template>
   <div class="container max-w-4xl! mx-auto mt-20 px-4">
-    <div class="bg-white dark:bg-zinc-900 shadow p-4 md:p-8 mb-8 rounded-lg">
+    <div class="bg-white dark:bg-zinc-900 shadow p-4 md:p-8 mb-8">
       <div class="flex flex-col md:flex-row gap-4">
         <img 
           src="/images/javamain.png" 
           alt="课程封面" 
-          class="w-full md:w-48 md:h-32 object-cover rounded" 
+          class="w-full md:w-48 md:h-32 object-cover" 
         />
         <div class="flex-1">
           <h2 class="text-xl md:text-2xl font-bold mb-2">
@@ -19,7 +19,7 @@
     </div>
 
     <!-- 目录 -->
-    <div class="bg-white dark:bg-zinc-900 shadow p-4 md:p-8 mb-8 rounded-lg">
+    <div class="bg-white dark:bg-zinc-900 shadow p-4 md:p-8 mb-8">
       <div class="flex items-center mb-4">
         <h2 class="text-xl md:text-2xl font-bold">课程目录</h2>
         <!-- <p class=" text-sm text-primary ml-2">(点击下方章节，即可跳转至对应章节)</p> -->
