@@ -1,7 +1,7 @@
 <template>
   <nav
     id="marketing-header"
-    class="fixed left-0 top-0 z-50 w-full transition-[height] duration-200 rounded-b-lg bg-background/80 shadow-sm backdrop-blur-lg"
+    class="fixed left-0 top-0 z-50 w-full transition-[height] duration-200 rounded-b-lg bg-background/70 shadow-sm backdrop-blur-lg"
     data-test="navigation"
   >
     <div class="container relative z-50">
@@ -20,7 +20,7 @@
             首页
           </NuxtLink>
           <NuxtLink
-            to="/blog"
+            to="/courses"
             class="block shrink-0 px-3 py-2 text-sm text-foreground hover:text-foreground/90"
           >
             课程
@@ -53,7 +53,7 @@
                     首页
                   </NuxtLink>
                   <NuxtLink
-                    to="/blog"
+                    to="/courses"
                     class="block w-full px-3 py-2 text-sm text-foreground hover:bg-muted hover:text-foreground/90 rounded-md"
                   >
                     课程

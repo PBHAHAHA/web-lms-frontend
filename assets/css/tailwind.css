@@ -178,3 +178,15 @@
 .container {
   @apply max-w-7xl mx-auto px-4;
 }
+
+
+@font-face {
+  font-family: LXGWWenKai;
+  src: url('/font/LXGWWenKai-Light.ttf') format('truetype');
+}
+
+html, body, #__nuxt {
+  /* height: 100%;
+  width: 100%; */
+  font-family: "LXGWWenKai", "Microsoft YaHei",  sans-serif;
+}

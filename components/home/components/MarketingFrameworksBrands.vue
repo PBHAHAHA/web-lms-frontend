@@ -1,7 +1,7 @@
 <template>
   <div class="mt-20">
     <div class="flex justify-center w-full">
-      <div class="grid grid-cols-3 sm:grid-cols-1 gap-10 relative max-w-3xl">
+      <div class="flex gap-10 relative max-w-3xl">
         <div
           v-for="brand in brandList"
           :key="brand.name"
