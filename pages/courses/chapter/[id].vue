@@ -26,6 +26,7 @@ const content = ref(`
             … or two list items.
           </li>
         </ul>
+        <p>醉里挑灯看剑，梦回吹角联营。八百里分麾下炙，五十弦番塞外声。沙场秋点兵。黑云压城城欲摧，甲光向日金鳞开。</p>
         <p>
           Isn’t that great? And all of that is editable. But wait, there’s more. Let’s try a code block:
         </p>
