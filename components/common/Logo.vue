@@ -10,8 +10,8 @@ const props = withDefaults(
 </script>
 
 <template>
-  <span class="cursor-pointer flex items-center">
+  <NuxtLink to="/" class="cursor-pointer flex items-center">
     <img src="/images/logo.png" alt="logo" class="w-6 h-8" />
     <h1 class="text-lg ml-2 font-bold text-foreground">WaliCode</h1>
-  </span>
+  </NuxtLink>
 </template>

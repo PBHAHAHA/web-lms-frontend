@@ -10,6 +10,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@nuxtjs/proxy": "^2.1.0",
     "@tailwindcss/vite": "^4.1.10",
     "@tiptap/pm": "^2.14.0",
     "@tiptap/starter-kit": "^2.14.0",

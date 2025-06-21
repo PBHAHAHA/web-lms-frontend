@@ -34,7 +34,7 @@
             v-if="it.lock"
             class="text-muted-foreground group-hover:text-primary transition-colors flex-1 flex items-center justify-between text-sm md:text-base"
           >
-            <span class="truncate pr-2">{{ it.title }}</span>
+            <span class="truncate pr-2">{{ it.chaptersTitle }}</span>
             <LockIcon class="flex-shrink-0" />
           </div>
           <NuxtLink
@@ -42,7 +42,7 @@
             :to="`/courses/chapter/${it.id}`"
             class="flex items-center justify-between text-muted-foreground group-hover:text-primary transition-colors flex-1 text-sm md:text-base truncate"
           >
-            <span class="truncate pr-2">{{ it.title }}</span>
+            <span class="truncate pr-2">{{ it.chaptersTitle }}</span>
             <Badge variant="outline" class="ml-2">
               试学
             </Badge> 
@@ -56,23 +56,30 @@
 <script setup>
 import { ref, computed } from "vue";
 import LockIcon from "~/components/courses/lockicon.vue";
+import { getCourseChapters } from "~/lib/api/modules/courses";
 // import { LockClosedIcon } from "lucide-vue-next";
 const courseId = useRoute().params.id;
 
-const catalog = ref([
-  { id: 1, title: "1. 课程介绍与环境搭建" },
-  { id: 2, title: "2. 前端基础：Vue 3 + TypeScript", lock: true },
-  { id: 3, title: "3. 后端开发：Node.js + Express", lock: true },
-  { id: 4, title: "4. 数据库设计与操作", lock: true },
-  { id: 5, title: "5. 项目实战与部署", lock: true },
-  { id: 6, title: "6. 域名配置与管理", lock: true },
-]);
+const catalog = ref([]);
 
 // 设置页面标题
 useHead({
   title: `在线课程`,
   meta: [{ name: "description", content: courseId }],
 });
+
+const getCourseChaptersData = async () => {
+  const res = await getCourseChapters({ id: courseId });
+  console.log(res, "res");
+  if(res.errorCode == 0){
+    catalog.value = res.data;
+  }
+};
+
+onMounted(() => {
+  getCourseChaptersData();
+});
+
 </script>
 
 <style scoped>

@@ -1,30 +1,77 @@
 <template>
-  <div class="container">
-    <EditorContent :editor="editor" />
-  </div>
+  <ClientOnly>
+    <div class="container">
+      <EditorContent :editor="editor" />
+    </div>
+  </ClientOnly>
 </template>
 
 <script setup>
-import { Editor, EditorContent } from '@tiptap/vue-3'
-import StarterKit from '@tiptap/starter-kit'
+import { Editor, EditorContent } from "@tiptap/vue-3";
+import StarterKit from "@tiptap/starter-kit";
 
 const props = defineProps({
   content: {
-    type: String,
-    required: true
-  }
-})
+    type: [String, Object],
+    required: true,
+  },
+});
 
-const editor = ref(null)
+const editor = ref(null);
+
+// 解析内容为JSON格式
+const parseContent = (content) => {
+  if (!content) return null;
+  
+  // 如果已经是对象，直接返回
+  if (typeof content === 'object') {
+    return content;
+  }
+  
+  // 如果是字符串，尝试解析为JSON
+  try {
+    console.log(content, "contenxxxxxxxt");
+    return JSON.parse(content);
+  } catch (error) {
+    console.error('解析JSON内容失败:', error);
+    // 如果解析失败，当作HTML处理
+    return content;
+  }
+};
+
+// 监听内容变化
+watch(() => props.content, (newContent) => {
+  if (editor.value && newContent) {
+    const parsedContent = parseContent(newContent);
+    console.log('设置新内容:', parsedContent);
+    
+    if (typeof parsedContent === 'object') {
+      // JSON格式内容
+      editor.value.commands.setContent(parsedContent, false);
+    } else {
+      // HTML字符串内容
+      editor.value.commands.setContent(parsedContent, false);
+    }
+  }
+});
 
 onMounted(() => {
-  console.log(props.content)
+  const initialContent = parseContent(props.content);
+  console.log('初始化编辑器内容:', initialContent);
+  
   editor.value = new Editor({
     extensions: [StarterKit],
-    content: props.content,
-    editable: false
-  })
-})
+    content: initialContent || null,
+    editable: false,
+  });
+});
+
+// 清理编辑器实例
+onBeforeUnmount(() => {
+  if (editor.value) {
+    editor.value.destroy();
+  }
+});
 </script>
 
 <style>
@@ -138,7 +185,7 @@ onMounted(() => {
     color: #6d28d9;
     text-decoration: underline;
     text-underline-offset: 2px;
-    
+
     &:hover {
       color: #5b21b6;
     }

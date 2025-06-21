@@ -7,9 +7,9 @@
     <div class="container relative z-50">
       <div class="flex items-center justify-stretch gap-6 transition-all duration-200 py-4">
         <div class="flex flex-1 justify-start">
-          <NuxtLink to="/" class="block hover:no-underline active:no-underline">
+          <!-- <NuxtLink to="/" class="block hover:no-underline active:no-underline"> -->
             <Logo />
-          </NuxtLink>
+          <!-- </NuxtLink> -->
         </div>
 
         <div class="hidden flex-1 items-center justify-center lg:flex">
