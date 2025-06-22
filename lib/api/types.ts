@@ -15,6 +15,8 @@ export interface RequestConfig {
   retry?: number;
   retryDelay?: number;
   method?: "GET" | "POST" | "PUT" | "DELETE";
+  mode?: 'cors' | 'no-cors' | 'same-origin';
+  credentials?: 'omit' | 'same-origin' | 'include';
 }
 
 // 错误类型

@@ -76,7 +76,7 @@
           </ClientOnly>
           <ClientOnly>
             <NuxtLink
-              to="/auth/signin"
+              to="/auth/login"
               class="text-primary-foreground"
             >
               <Button class="hidden lg:flex px-6">

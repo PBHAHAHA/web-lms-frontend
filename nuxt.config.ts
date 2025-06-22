@@ -10,6 +10,16 @@ export default defineNuxtConfig({
     plugins: [
       tailwindcss(),
     ],
+    server: {
+      proxy: {
+        '/api': {
+          target: 'http://www.clothesinclothes.xyz:8888',
+          changeOrigin: true,
+          // secure: false, // 如果目标服务器使用自签名证书
+          // rewrite: (path) => path.replace(/^\/api/, ''),
+        }
+      }
+    }
   },
   modules: ['shadcn-nuxt'],
   shadcn: {
@@ -30,7 +40,7 @@ export default defineNuxtConfig({
     
     // 公共配置（客户端和服务端都可用）
     public: {
-      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || 'http://localhost:3333',
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || '/api',
       appName: process.env.NUXT_PUBLIC_APP_NAME || 'WaliCode',
       appVersion: process.env.NUXT_PUBLIC_APP_VERSION || '1.0.0',
     }

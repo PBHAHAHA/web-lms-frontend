@@ -5,14 +5,13 @@ export const createRequest = (config: RequestConfig = {}) => {
   // 在函数内部获取API基础地址
   const getApiBaseUrl = (): string => {
     const runtimeConfig = useRuntimeConfig();
-    return (
-      (runtimeConfig.public.apiBaseUrl as string) || "http://localhost:3333"
-    );
+    console.log(runtimeConfig, "runtimeConfig");
+    return (runtimeConfig.public.apiBaseUrl as string) || "/api";
   };
 
   // 默认配置
   const defaultConfig: RequestConfig = {
-    baseURL: getApiBaseUrl() ,
+    baseURL: getApiBaseUrl(),
     timeout: 10000,
     retry: 3,
     retryDelay: 1000,
@@ -43,22 +42,17 @@ export const createRequest = (config: RequestConfig = {}) => {
 
   // 响应拦截器
   const responseInterceptor = (response: any) => {
-    // console.log(JSON.parse(response), "response");
-    // response = JSON.parse(response);
-    // // 根据实际响应结构判断成功状态
-    // if (response.errorCode != "0") {
-    //   throw new Error(response.errorMsg || "请求失败");
-    // }
     // 去除转义，直接返回响应数据
-    if (response && typeof response === 'object') {
+    if (response && typeof response === "object") {
       return response;
     }
-    console.log((response), "response");
+    console.log(response, "response");
     return JSON.parse(response);
   };
 
   // 错误处理
   const errorHandler = (error: ApiError) => {
+    console.error("API请求错误:", error);
     // 统一错误处理
     if (error.response?.status === 401) {
       // 处理未授权
@@ -76,9 +70,9 @@ export const createRequest = (config: RequestConfig = {}) => {
     console.log(options, "options");
     try {
       const config = requestInterceptor({ ...finalConfig, ...options });
-    //   console.log(config, "config");
+      console.log(config, "final config");
       const response = await $fetch<ApiResponse<T>>(url, config);
-    //   console.log(response, "response");
+      console.log(response, "response");
       return responseInterceptor(response);
     } catch (error) {
       return errorHandler(error as ApiError);
