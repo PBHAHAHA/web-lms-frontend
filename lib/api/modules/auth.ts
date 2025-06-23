@@ -6,6 +6,17 @@ export interface LoginParams {
   password: string
 }
 
+export interface RegisterParams {
+  username: string
+  password: string
+  code: string
+}
+
+export interface LoginUserResponse {
+  id: string
+  username: string
+}
+
 
 // 认证相关API
 export const useAuthApi = () => {
@@ -17,6 +28,11 @@ export const useAuthApi = () => {
       console.log(data, "登录数据2")    
       return api.post<any>('/auth/login', data)
     },
-   
+    register: (data: RegisterParams) => {
+      return api.post<any>('/auth/registered', data)
+    },
+    getLoginUser: () => {
+      return api.get<LoginUserResponse>('/auth/getLoginUser')
+    }
   }
 }

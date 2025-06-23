@@ -15,6 +15,8 @@ export const createRequest = (config: RequestConfig = {}) => {
     timeout: 10000,
     retry: 3,
     retryDelay: 1000,
+    // 自动携带cookie
+    credentials: 'include',
   };
 
   const finalConfig = { ...defaultConfig, ...config };

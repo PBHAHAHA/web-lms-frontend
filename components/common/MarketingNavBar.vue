@@ -65,17 +65,23 @@
                     课程计划
                   </NuxtLink>
                   <NuxtLink
-                    to="/auth/signin"
+                    v-if="!isLoggedIn"
+                    to="/auth/login"
                     class="block w-full px-3 py-2 text-sm text-foreground hover:bg-muted hover:text-foreground/90 rounded-md"
                   >
                     登录
                   </NuxtLink>
+                  <div v-if="isLoggedIn" class="px-3 py-2 text-sm text-foreground">
+                    欢迎，{{ username }}
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>
           </ClientOnly>
           <ClientOnly>
+            <!-- 未登录时显示登录按钮 -->
             <NuxtLink
+              v-if="!isLoggedIn"
               to="/auth/login"
               class="text-primary-foreground"
             >
@@ -83,6 +89,11 @@
                 登录
               </Button>
             </NuxtLink>
+            
+            <!-- 已登录时显示用户名 -->
+            <div v-if="isLoggedIn" class="hidden lg:flex items-center gap-2">
+              <span class="text-sm text-foreground">欢迎，{{ username }}</span>
+            </div>
           </ClientOnly>
         </div>
       </div>
@@ -93,6 +104,39 @@
 <script setup>
 import Logo from './Logo.vue';
 import { LucideMenu } from 'lucide-vue-next';
+import { useAuth } from '~/composables/useAuth';
+
+const { isLoggedIn, getLoginUser } = useAuth();
+
+// 用户名状态
+const username = ref('');
+
+// 获取用户信息
+const fetchUserInfo = async () => {
+  if (isLoggedIn.value) {
+    try {
+      const response = await getLoginUser();
+      if (response && response.username) {
+        username.value = response.username;
+      }
+    } catch (error) {
+      console.error('获取用户信息失败:', error);
+    }
+  }
+};
+
+onMounted(async () => {
+  await fetchUserInfo();
+});
+
+// 监听登录状态变化
+watch(isLoggedIn, async (newValue) => {
+  if (newValue) {
+    await fetchUserInfo();
+  } else {
+    username.value = '';
+  }
+});
 </script>
 
 

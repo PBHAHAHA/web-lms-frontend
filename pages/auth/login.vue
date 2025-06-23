@@ -48,13 +48,10 @@
           </div>
           
           <div class="form-options">
-            <label class="checkbox-label">
-              <input v-model="form.remember" type="checkbox" class="checkbox" />
-              记住我
-            </label>
+            <!-- <div></div>
             <NuxtLink to="/auth/forgot-password" class="forgot-link">
               忘记密码？
-            </NuxtLink>
+            </NuxtLink> -->
           </div>
           
           <button
