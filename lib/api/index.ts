@@ -1,96 +1,48 @@
-import type { ApiResponse, RequestConfig, ApiError } from "./types";
+interface myFetchOptions{
+  headers?:Record<string, string>
+  [key:string] : any
+}
 
-// 创建请求实例
-export const createRequest = (config: RequestConfig = {}) => {
-  // 在函数内部获取API基础地址
-  const getApiBaseUrl = (): string => {
-    const runtimeConfig = useRuntimeConfig();
-    console.log(runtimeConfig, "runtimeConfig");
-    return (runtimeConfig.public.apiBaseUrl as string) || "/api";
-  };
+export const useHttpFetch = (url:string,opt:myFetchOptions) => {
+  //token
+  const token = useCookie('authorized-token')
+  // 添加token和请求头
+  const headers = {
+      ...opt.headers,
+      ...(token.value? {Authorization:`Bearer ${token.value}`}:{}),
+      // cookie: token.value
+  }
 
-  // 默认配置
-  const defaultConfig: RequestConfig = {
-    baseURL: getApiBaseUrl(),
-    timeout: 10000,
-    retry: 3,
-    retryDelay: 1000,
-    // 自动携带cookie
-    credentials: 'include',
-  };
+  opt.headers = headers
 
-  const finalConfig = { ...defaultConfig, ...config };
+  return useFetch(url,{
+      ...opt,
+      baseURL: 'http://www.clothesinclothes.xyz:8888',//基本url配置
+      credentials: 'include',
+      onRequest({ request, options }) {
+          console.log('request',request)
+      },
+      onRequestError({ request, options, error }) {
+         
+      },
+      onResponse({ request, response, options }) {
+          // Process the response data
+          
+          //自定义返回数据
+           if (response._data.code === 0){
+              //处理
+               response._data = response._data.data
+           }else{
 
-  // 请求拦截器
-  const requestInterceptor = (config: RequestConfig) => {
-    console.log(config, "config");
-    // 在这里可以添加token等认证信息
-    const token = useCookie("auth-token");
-    console.log(token.value, "token");
-    if (token.value) {
-      config.headers = {
-        ...config.headers,
-        Authorization: `${token.value}`,
-        "Content-Type": "application/json",
-      };
-    } else {
-      config.headers = {
-        ...config.headers,
-        "Content-Type": "application/json",
-      };
-    }
-    return config;
-  };
+           }
+          console.log('response',response)
+      },
+      onResponseError({ request, response, options }) {
+          // Handle the response errors
+         //判断状态，如401时，返回未登录
+      }
+  })
 
-  // 响应拦截器
-  const responseInterceptor = (response: any) => {
-    // 去除转义，直接返回响应数据
-    if (response && typeof response === "object") {
-      return response;
-    }
-    console.log(response, "response");
-    return JSON.parse(response);
-  };
 
-  // 错误处理
-  const errorHandler = (error: ApiError) => {
-    console.error("API请求错误:", error);
-    // 统一错误处理
-    if (error.response?.status === 401) {
-      // 处理未授权
-      //   navigateTo('/login')
-    }
-    throw error;
-  };
+}
 
-  // 基础请求方法
-  const request = async <T = any>(
-    url: string,
-    options: RequestConfig = {}
-  ): Promise<T> => {
-    console.log(url, "url");
-    console.log(options, "options");
-    try {
-      const config = requestInterceptor({ ...finalConfig, ...options });
-      console.log(config, "final config");
-      const response = await $fetch<ApiResponse<T>>(url, config);
-      console.log(response, "response");
-      return responseInterceptor(response);
-    } catch (error) {
-      return errorHandler(error as ApiError);
-    }
-  };
-
-  return {
-    get: <T = any>(url: string, params?: Record<string, any>) =>
-      request<T>(url, { method: "GET", params }),
-    post: <T = any>(url: string, data?: any) =>
-      request<T>(url, { method: "POST", body: data }),
-    put: <T = any>(url: string, data?: any) =>
-      request<T>(url, { method: "PUT", body: data }),
-    delete: <T = any>(url: string) => request<T>(url, { method: "DELETE" }),
-  };
-};
-
-// 导出一个创建API实例的函数，而不是直接导出实例
-export const useApi = () => createRequest();

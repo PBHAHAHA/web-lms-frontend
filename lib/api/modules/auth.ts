@@ -1,4 +1,4 @@
-import { useApi } from '../index'
+import { useHttpFetch } from '../index'
 
 // 认证相关类型定义
 export interface LoginParams {
@@ -20,19 +20,26 @@ export interface LoginUserResponse {
 
 // 认证相关API
 export const useAuthApi = () => {
-  const api = useApi()
   
   return {
     // 登录
     login: (data: LoginParams) => {
       console.log(data, "登录数据2")    
-      return api.post<any>('/auth/login', data)
+      return useHttpFetch('/auth/login', {
+        method: 'POST',
+        body: data
+      })
     },
     register: (data: RegisterParams) => {
-      return api.post<any>('/auth/registered', data)
+      return useHttpFetch('/auth/registered', {
+        method: 'POST',
+        body: data
+      })
     },
     getLoginUser: () => {
-      return api.get<LoginUserResponse>('/auth/getLoginUser')
+      return useHttpFetch('/auth/getLoginUser', {
+        method: 'GET'
+      })
     }
   }
 }

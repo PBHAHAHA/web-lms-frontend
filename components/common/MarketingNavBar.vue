@@ -1,4 +1,5 @@
 <template>
+  <!-- <ClientOnly> -->
   <nav
     id="marketing-header"
     class="fixed left-0 top-0 z-50 w-full transition-[height] duration-200 rounded-b-lg bg-background/70 shadow-sm backdrop-blur-lg"
@@ -99,6 +100,7 @@
       </div>
     </div>
   </nav>
+<!-- </ClientOnly> -->
 </template>
 
 <script setup>
@@ -113,7 +115,7 @@ const username = ref('');
 
 // 获取用户信息
 const fetchUserInfo = async () => {
-  if (isLoggedIn.value) {
+  // if (isLoggedIn.value) {
     try {
       const response = await getLoginUser();
       if (response && response.username) {
@@ -122,7 +124,7 @@ const fetchUserInfo = async () => {
     } catch (error) {
       console.error('获取用户信息失败:', error);
     }
-  }
+  // }
 };
 
 onMounted(async () => {
