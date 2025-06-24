@@ -72,7 +72,7 @@
                     登录
                   </NuxtLink>
                   <div v-if="isLoggedIn" class="px-3 py-2 text-sm text-foreground">
-                    欢迎，{{ username }}
+                    欢迎，{{ userInfo.username }}
                   </div>
                 </div>
               </SheetContent>
@@ -91,8 +91,8 @@
             </NuxtLink>
             
             <!-- 已登录时显示用户名 -->
-            <div v-if="isLoggedIn" class="hidden lg:flex items-center gap-2">
-              <span class="text-sm text-foreground">欢迎，{{ username }}</span>
+            <div class="hidden lg:flex items-center gap-2">
+              <span class="text-sm text-foreground">欢迎，{{ userInfo.username }}</span>
             </div>
           </ClientOnly>
         </div>
@@ -106,37 +106,12 @@ import Logo from './Logo.vue';
 import { LucideMenu } from 'lucide-vue-next';
 import { useAuth } from '~/composables/useAuth';
 
-const { isLoggedIn, getLoginUser } = useAuth();
+const { isLoggedIn, userInfo } = useAuth();
+
 
 // 用户名状态
-const username = ref('');
+// const username = ref('');
 
-// 获取用户信息
-const fetchUserInfo = async () => {
-  if (isLoggedIn.value) {
-    try {
-      const response = await getLoginUser();
-      if (response && response.username) {
-        username.value = response.username;
-      }
-    } catch (error) {
-      console.error('获取用户信息失败:', error);
-    }
-  }
-};
-
-onMounted(async () => {
-  await fetchUserInfo();
-});
-
-// 监听登录状态变化
-watch(isLoggedIn, async (newValue) => {
-  if (newValue) {
-    await fetchUserInfo();
-  } else {
-    username.value = '';
-  }
-});
 </script>
 
 

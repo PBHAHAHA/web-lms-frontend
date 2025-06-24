@@ -24,21 +24,33 @@ export const createRequest = (config: RequestConfig = {}) => {
   // 请求拦截器
   const requestInterceptor = (config: RequestConfig) => {
     console.log(config, "config");
-    // 在这里可以添加token等认证信息
-    const token = useCookie("auth-token");
-    console.log(token.value, "token");
-    if (token.value) {
-      config.headers = {
-        ...config.headers,
-        Authorization: `${token.value}`,
-        "Content-Type": "application/json",
-      };
-    } else {
-      config.headers = {
-        ...config.headers,
-        "Content-Type": "application/json",
-      };
+    
+    // 获取 token 信息
+    const authToken = useCookie("authorized-token");
+    const tokenName = useCookie("token-name"); // 存储 tokenName
+    
+    console.log("Token信息:", {
+      tokenName: tokenName.value,
+      tokenValue: authToken.value
+    });
+    
+    // 设置基础请求头
+    config.headers = {
+      ...config.headers,
+      "Content-Type": "application/json",
+    };
+    
+    // 如果有 token 信息，添加到请求头
+    if (authToken.value && tokenName.value) {
+      // 使用 tokenName 作为 key，tokenValue 作为 value
+      config.headers[tokenName.value] = authToken.value;
+      console.log(`添加请求头: ${tokenName.value} = ${authToken.value}`);
+    } else if (authToken.value) {
+      // 如果没有 tokenName，使用默认的 Authorization
+      config.headers.Authorization = `Bearer ${authToken.value}`;
+      console.log(`使用默认Authorization: Bearer ${authToken.value}`);
     }
+    
     return config;
   };
 

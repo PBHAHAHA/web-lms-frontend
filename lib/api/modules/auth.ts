@@ -17,6 +17,26 @@ export interface LoginUserResponse {
   username: string
 }
 
+// 登录响应数据结构
+export interface LoginResponse {
+  errorCode: string
+  errorMsg: string
+  data: {
+    tokenName: string
+    tokenValue: string
+    isLogin: boolean
+    loginId: string // JSON 字符串，包含用户信息 {"id":3,"userName":"pub"}
+    loginType: string
+    tokenTimeout: number
+    sessionTimeout: number
+    tokenSessionTimeout: number
+    tokenActivityTimeout: number
+    loginDevice: string
+    tag: null
+  }
+  requestId: null
+}
+
 
 // 认证相关API
 export const useAuthApi = () => {
@@ -26,7 +46,7 @@ export const useAuthApi = () => {
     // 登录
     login: (data: LoginParams) => {
       console.log(data, "登录数据2")    
-      return api.post<any>('/auth/login', data)
+      return api.post<LoginResponse>('/auth/login', data)
     },
     register: (data: RegisterParams) => {
       return api.post<any>('/auth/registered', data)
