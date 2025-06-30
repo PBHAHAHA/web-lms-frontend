@@ -92,7 +92,7 @@
             
             <!-- 已登录时显示用户名 -->
             <div class="hidden lg:flex items-center gap-2">
-              <span class="text-sm text-foreground">欢迎，{{ userInfo.username }}</span>
+              <span class="text-sm text-foreground">欢迎，{{ userInfo?.username }}</span>
             </div>
           </ClientOnly>
         </div>

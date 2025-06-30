@@ -16,7 +16,7 @@ export const useAuth = () => {
   const restoreUserInfo = () => {
     const stored = storage.getItem<LoginUserResponse>(USER_INFO_KEY)
     if (stored) {
-      userInfo.value = stored
+      userInfo.value = stored || {}
     }
   }
   
