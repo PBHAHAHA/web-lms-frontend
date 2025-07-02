@@ -20,17 +20,17 @@
         
         <form @submit.prevent="handleLogin" class="login-form">
           <div class="form-group">
-            <label for="username" class="form-label">用户名</label>
+            <label for="email" class="form-label">邮箱</label>
             <input
-              id="username"
-              v-model="form.username"
-              type="text"
+              id="email"
+              v-model="form.email"
+              type="email"
               class="form-input"
-              :class="{ 'form-input-error': errors.username }"
-              placeholder="请输入您的用户名"
+              :class="{ 'form-input-error': errors.email }"
+              placeholder="请输入您的邮箱地址"
               required
             />
-            <span v-if="errors.username" class="field-error">{{ errors.username }}</span>
+            <span v-if="errors.email" class="field-error">{{ errors.email }}</span>
           </div>
           
           <div class="form-group">
@@ -101,7 +101,7 @@
   
   // 表单数据
   const form = reactive<LoginParams>({
-    username: '',
+    email: '',
     password: '',
   })
   
@@ -110,14 +110,14 @@
   const error = ref('')
   const success = ref('')
   const errors = reactive({
-    username: '',
+    email: '',
     password: ''
   })
   
   // 清除错误信息
   const clearErrors = () => {
     error.value = ''
-    errors.username = ''
+    errors.email = ''
     errors.password = ''
   }
   
@@ -126,12 +126,12 @@
     clearErrors()
     let isValid = true
     
-    // 用户名验证
-    if (!form.username) {
-      errors.username = '请输入用户名'
+    // 邮箱验证
+    if (!form.email) {
+      errors.email = '请输入邮箱地址'
       isValid = false
-    } else if (form.username.length < 3) {
-      errors.username = '用户名至少需要3个字符'
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      errors.email = '请输入有效的邮箱地址'
       isValid = false
     }
     
@@ -156,14 +156,17 @@
     
     try {
       console.log(form, "登录数据3")
-      const response = await login(form)
-      if(response.errorCode == 0){
+      const res = await login(form)
+      console.log(res, "登录数据4")
+      let loginResponse = res.loginResponse
+      if(loginResponse.errorCode == 0){
         success.value = '登录成功！正在跳转...'
       }else{
-        error.value = response.errorMsg
+        error.value = loginResponse.errorMsg
+        return
       }
 
-      console.log('登录成功:', response)
+      console.log('登录成功:', loginResponse)
       
       // 保存用户信息和token到cookie
       const userCookie = useCookie('user', {
@@ -177,8 +180,8 @@
         sameSite: 'strict'
       })
       
-      userCookie.value = JSON.stringify(response.user)
-      tokenCookie.value = response.token
+      userCookie.value = JSON.stringify(loginResponse.user)
+      tokenCookie.value = loginResponse.token
       
       success.value = '登录成功！正在跳转...'
       
@@ -195,13 +198,13 @@
       
       // 处理不同类型的错误
       if (err.response?.status === 401) {
-        error.value = '用户名或密码错误'
+        error.value = '邮箱或密码错误'
       } else if (err.response?.status === 422) {
         // 处理表单验证错误
         const validationErrors = err.response.data?.errors
         if (validationErrors) {
-          if (validationErrors.username) {
-            errors.username = validationErrors.username[0]
+          if (validationErrors.email) {
+            errors.email = validationErrors.email[0]
           }
           if (validationErrors.password) {
             errors.password = validationErrors.password[0]
@@ -222,8 +225,8 @@
   }
   
   // 监听表单变化，清除对应字段的错误
-  watch(() => form.username, () => {
-    if (errors.username) errors.username = ''
+  watch(() => form.email, () => {
+    if (errors.email) errors.email = ''
     if (error.value) error.value = ''
   })
   
@@ -418,4 +421,3 @@
     color: #f48400;
   }
   </style>
-  
