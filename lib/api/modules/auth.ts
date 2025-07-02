@@ -8,8 +8,19 @@ export interface LoginParams {
 
 export interface RegisterParams {
   username: string
+  email: string
   password: string
   code: string
+}
+
+export interface EmailVerificationParams {
+  email: string
+}
+
+export interface EmailVerificationResponse {
+  errorCode: number
+  errorMsg: string
+  data?: any
 }
 
 export interface LoginUserResponse {
@@ -48,11 +59,17 @@ export const useAuthApi = () => {
       console.log(data, "登录数据2")    
       return api.post<LoginResponse>('/auth/login', data)
     },
+    // 注册
     register: (data: RegisterParams) => {
       return api.post<any>('/auth/registered', data)
     },
+    // 获取登录用户信息
     getLoginUser: () => {
       return api.get<LoginUserResponse>('/auth/getLoginUser')
+    },
+    // 发送邮箱验证码
+    sendEmailVerification: (data: EmailVerificationParams) => {
+      return api.post<EmailVerificationResponse>('/auth/verificationEmail', data)
     }
   }
 }

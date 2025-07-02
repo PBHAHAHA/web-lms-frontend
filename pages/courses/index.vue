@@ -19,7 +19,7 @@ const courseList = ref([]);
 onMounted(async () => {
   const res = await getCourseList({ pageNo: 1, pageSize: 10 });
   // console.log(res, "res");
-  getLoginUser()
+  // getLoginUser()
   if(res.errorCode == 0){
     console.log(res.data, "res.data");
     courseList.value = res.data.records;

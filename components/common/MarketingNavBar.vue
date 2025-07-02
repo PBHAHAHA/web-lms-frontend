@@ -64,35 +64,94 @@
                   >
                     课程计划
                   </NuxtLink>
-                  <NuxtLink
-                    v-if="!isLoggedIn"
-                    to="/auth/login"
-                    class="block w-full px-3 py-2 text-sm text-foreground hover:bg-muted hover:text-foreground/90 rounded-md"
-                  >
-                    登录
-                  </NuxtLink>
-                  <div v-if="isLoggedIn" class="px-3 py-2 text-sm text-foreground">
-                    欢迎，{{ userInfo.username }}
+                  
+                  <!-- 移动端登录/用户信息 -->
+                  <div class="border-t mt-4 pt-4">
+                    <NuxtLink
+                      v-if="!isLoggedIn"
+                      to="/auth/login"
+                      class="block w-full px-3 py-2 text-sm text-foreground hover:bg-muted hover:text-foreground/90 rounded-md"
+                    >
+                      登录
+                    </NuxtLink>
+                    <NuxtLink
+                      v-if="!isLoggedIn"
+                      to="/auth/register"
+                      class="block w-full px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground/90 rounded-md"
+                    >
+                      注册
+                    </NuxtLink>
+                    
+                    <!-- 已登录用户信息 -->
+                    <div v-if="isLoggedIn" class="space-y-2">
+                      <div class="px-3 py-2 text-sm text-foreground border-b">
+                        <div class="flex items-center gap-2">
+                          <div class="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-xs text-primary-foreground">
+                            {{ getUserInitial(userInfo?.username) }}
+                          </div>
+                          <span class="font-medium">{{ userInfo?.username || '用户' }}</span>
+                        </div>
+                      </div>
+                      <NuxtLink
+                        to="/profile"
+                        class="flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted hover:text-foreground/90 rounded-md"
+                      >
+                        <LucideUser class="w-4 h-4" />
+                        个人中心
+                      </NuxtLink>
+                      <NuxtLink
+                        to="/my-courses"
+                        class="flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted hover:text-foreground/90 rounded-md"
+                      >
+                        <LucideBook class="w-4 h-4" />
+                        我的课程
+                      </NuxtLink>
+                      <NuxtLink
+                        to="/settings"
+                        class="flex items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted hover:text-foreground/90 rounded-md"
+                      >
+                        <LucideSettings class="w-4 h-4" />
+                        设置
+                      </NuxtLink>
+                      <button
+                        @click="handleLogout"
+                        class="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 rounded-md text-left"
+                      >
+                        <LucideLogOut class="w-4 h-4" />
+                        退出登录
+                      </button>
+                    </div>
                   </div>
                 </div>
               </SheetContent>
             </Sheet>
           </ClientOnly>
+          
           <ClientOnly>
-            <!-- 未登录时显示登录按钮 -->
-            <NuxtLink
-              v-if="!isLoggedIn"
-              to="/auth/login"
-              class="text-primary-foreground"
-            >
-              <Button class="hidden lg:flex px-6">
-                登录
-              </Button>
-            </NuxtLink>
-            
-            <!-- 已登录时显示用户名 -->
+            <!-- 桌面端登录/用户信息 -->
             <div class="hidden lg:flex items-center gap-2">
-              <span class="text-sm text-foreground">欢迎，{{ userInfo?.username }}</span>
+              <!-- 未登录时显示登录和注册按钮 -->
+              <template v-if="!isLoggedIn">
+                <NuxtLink
+                  to="/auth/register"
+                  class="text-foreground hover:text-foreground/80"
+                >
+                  <Button variant="ghost" size="sm">
+                    注册
+                  </Button>
+                </NuxtLink>
+                <NuxtLink
+                  to="/auth/login"
+                  class="text-primary-foreground"
+                >
+                  <Button size="sm" class="px-6">
+                    登录
+                  </Button>
+                </NuxtLink>
+              </template>
+              
+              <!-- 已登录时显示用户菜单 -->
+              <UserMenu v-if="isLoggedIn" />
             </div>
           </ClientOnly>
         </div>
@@ -103,15 +162,35 @@
 
 <script setup>
 import Logo from './Logo.vue';
-import { LucideMenu } from 'lucide-vue-next';
+import UserMenu from './UserMenu.vue';
+import { LucideMenu, LucideUser, LucideBook, LucideSettings, LucideLogOut } from 'lucide-vue-next';
 import { useAuth } from '~/composables/useAuth';
 
-const { isLoggedIn, userInfo } = useAuth();
+const { isLoggedIn, userInfo, logout, initAuth } = useAuth();
 
+// 组件挂载时初始化认证状态
+onMounted(() => {
+  initAuth();
+});
 
-// 用户名状态
-// const username = ref('');
+// 获取用户名首字母
+const getUserInitial = (username) => {
+  if (!username) return 'U';
+  return username.charAt(0).toUpperCase();
+};
 
+// 处理登出
+const handleLogout = async () => {
+  try {
+    // 调用登出方法
+    logout();
+    
+    // 跳转到首页
+    await navigateTo('/');
+  } catch (error) {
+    console.error('登出失败:', error);
+  }
+};
 </script>
 
 

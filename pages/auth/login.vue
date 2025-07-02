@@ -56,7 +56,7 @@
           
           <button
             type="submit"
-            class="login-button"
+            class="login-button bg-primary"
             :disabled="loading"
           >
             <Icon v-if="loading" name="heroicons:arrow-path" class="w-5 h-5 animate-spin" />
@@ -244,7 +244,7 @@
   
   .login-card {
     background: white;
-    border-radius: 12px;
+    /* border-radius: 12px; */
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     padding: 2rem;
     width: 100%;
@@ -315,14 +315,14 @@
   .form-input {
     padding: 0.75rem;
     border: 1px solid #d1d5db;
-    border-radius: 8px;
+    /* border-radius: 8px; */
     font-size: 1rem;
     transition: border-color 0.2s, box-shadow 0.2s;
   }
   
   .form-input:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: #f48400;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   }
   
@@ -362,21 +362,21 @@
   }
   
   .forgot-link {
-    color: #3b82f6;
+    color: #f48400;
     text-decoration: none;
     font-size: 0.875rem;
     transition: color 0.2s;
   }
   
   .forgot-link:hover {
-    color: #2563eb;
+    color: #f48400;
   }
   
   .login-button {
-    background: #3b82f6;
+    /* background: #3b82f6; */
     color: white;
     border: none;
-    border-radius: 8px;
+    /* border-radius: 8px; */
     padding: 0.75rem;
     font-size: 1rem;
     font-weight: 500;
@@ -389,7 +389,7 @@
   }
   
   .login-button:hover:not(:disabled) {
-    background: #2563eb;
+    background: #f48400;
   }
   
   .login-button:disabled {
@@ -408,14 +408,14 @@
   }
   
   .register-link {
-    color: #3b82f6;
+    color: #f48400;
     text-decoration: none;
     font-weight: 500;
     transition: color 0.2s;
   }
   
   .register-link:hover {
-    color: #2563eb;
+    color: #f48400;
   }
   </style>
   
