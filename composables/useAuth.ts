@@ -4,6 +4,7 @@ import {
   type RegisterParams,
   type LoginUserResponse,
   type LoginResponse,
+  type GetLoginUserResponse,
 } from "~/lib/api/modules/auth";
 
 export const useAuth = () => {
@@ -22,7 +23,7 @@ export const useAuth = () => {
   const restoreUserInfo = () => {
     const stored = storage.getItem<LoginUserResponse>(USER_INFO_KEY);
     if (stored) {
-      userInfo.value = stored || {};
+      userInfo.value = stored;
     }
   };
 
@@ -54,6 +55,11 @@ export const useAuth = () => {
     return !!authCookie.value;
   });
 
+  // 检查是否是会员
+  const isMember = computed(() => {
+    return userInfo.value?.member == 'BASIC';
+  });
+
   // 获取登录时间
   const getLoginTime = (): number | null => {
     return storage.getItem<number>(LOGIN_TIME_KEY);
@@ -74,6 +80,25 @@ export const useAuth = () => {
     return duration < maxDurationMs;
   };
 
+  // 检查token状态的调试函数
+  const debugTokenStatus = () => {
+    const authToken = useCookie("authorized-token");
+    const tokenName = useCookie("token-name");
+    
+    console.log("Token调试信息:", {
+      tokenName: tokenName.value,
+      tokenValue: authToken.value,
+      isLoggedIn: isLoggedIn.value
+    });
+    
+    return {
+      hasToken: !!authToken.value,
+      hasTokenName: !!tokenName.value,
+      tokenName: tokenName.value,
+      tokenValue: authToken.value?.substring(0, 20) + "..." // 只显示前20个字符
+    };
+  };
+
   // 初始化时恢复用户信息
   if (process.client) {
     restoreUserInfo();
@@ -88,55 +113,91 @@ export const useAuth = () => {
 
       // 从登录响应中提取用户信息
       if (response && response.data && response.data.loginId) {
+        // 先设置 token 信息到 cookie
+        const authToken = useCookie("authorized-token");
+        const tokenName = useCookie("token-name");
+
+        authToken.value = response.data.tokenValue;
+        tokenName.value = response.data.tokenName;
+
+        // 备份 token 信息到 localStorage
+        saveTokenInfo(response.data.tokenName, response.data.tokenValue);
+
+        console.log("Token信息已保存:", {
+          tokenName: response.data.tokenName,
+          tokenValue: response.data.tokenValue,
+        });
+
+        // 等待一小段时间确保cookie设置完成
+        await new Promise(resolve => setTimeout(resolve, 100));
+
         try {
           // 解析 loginId 中的用户信息（JSON 字符串）
           const userData = JSON.parse(response.data.loginId);
           console.log("解析用户信息成功:", userData);
 
-          // 存储用户信息到状态中（持久化）
-          const parsedUserInfo = {
-            id: userData.id?.toString() || "",
-            username: userData.userName || "",
-          };
-          saveUserInfo(parsedUserInfo);
-
-          // 存储 token 信息到 cookie
-          const authToken = useCookie("authorized-token");
-          const tokenName = useCookie("token-name");
-
-          authToken.value = response.data.tokenValue;
-          tokenName.value = response.data.tokenName;
-
-          // 备份 token 信息到 localStorage
-          saveTokenInfo(response.data.tokenName, response.data.tokenValue);
-
-          console.log("Token信息已保存:", {
-            tokenName: response.data.tokenName,
-            tokenValue: response.data.tokenValue,
-          });
-
-          return {
-            loginResponse: response,
-            userInfo: parsedUserInfo,
-            token: response.data.tokenValue,
-          };
+          // 登录成功后立即获取完整的用户信息
+          try {
+            console.log("准备获取完整用户信息，当前token状态:", {
+              tokenName: tokenName.value,
+              tokenValue: authToken.value
+            });
+            
+            const fullUserInfo = await getLoginUser();
+            console.log("获取完整用户信息成功:", fullUserInfo);
+            
+            return {
+              loginResponse: response,
+              userInfo: fullUserInfo,
+              token: response.data.tokenValue,
+            };
+          } catch (userInfoError) {
+            console.warn("获取完整用户信息失败，使用基本信息:", userInfoError);
+            
+            // 如果获取完整信息失败，使用基本信息
+            const parsedUserInfo: LoginUserResponse = {
+              id: userData.id?.toString() || "0",
+              userName: userData.userName || "",
+              email: userData.email || "",
+              member: userData.member || "0"
+            };
+            saveUserInfo(parsedUserInfo);
+            
+            return {
+              loginResponse: response,
+              userInfo: parsedUserInfo,
+              token: response.data.tokenValue,
+            };
+          }
         } catch (parseError) {
           console.warn("解析用户信息失败:", parseError);
-          // 即使解析失败，仍然保存 token 信息
-          const authToken = useCookie("authorized-token");
-          const tokenName = useCookie("token-name");
+          
+          // 等待一小段时间确保cookie设置完成
+          await new Promise(resolve => setTimeout(resolve, 100));
 
-          authToken.value = response.data.tokenValue;
-          tokenName.value = response.data.tokenName;
-
-          // 备份 token 信息到 localStorage
-          saveTokenInfo(response.data.tokenName, response.data.tokenValue);
-
-          return {
-            loginResponse: response,
-            userInfo: null,
-            token: response.data.tokenValue,
-          };
+          // 尝试获取完整用户信息
+          try {
+            console.log("通过API获取用户信息，当前token状态:", {
+              tokenName: tokenName.value,
+              tokenValue: authToken.value
+            });
+            
+            const fullUserInfo = await getLoginUser();
+            console.log("通过API获取用户信息成功:", fullUserInfo);
+            
+            return {
+              loginResponse: response,
+              userInfo: fullUserInfo,
+              token: response.data.tokenValue,
+            };
+          } catch (userInfoError) {
+            console.error("获取用户信息完全失败:", userInfoError);
+            return {
+              loginResponse: response,
+              userInfo: null,
+              token: response.data.tokenValue,
+            };
+          }
         }
       }
 
@@ -159,15 +220,52 @@ export const useAuth = () => {
   };
 
   // 获取登录用户信息
-  const getLoginUser = async () => {
+  const getLoginUser = async (): Promise<LoginUserResponse> => {
     try {
-      const response = await authApi.getLoginUser();
-      // 更新用户信息状态（持久化）
-      saveUserInfo(response.data);
-      return response.data;
+      // 调用前检查token状态
+      const tokenDebug = debugTokenStatus();
+      console.log("调用getLoginUser前的token状态:", tokenDebug);
+      
+      if (!tokenDebug.hasToken) {
+        throw new Error("Token不存在，无法获取用户信息");
+      }
+      
+      const response: GetLoginUserResponse = await authApi.getLoginUser();
+      console.log("getLoginUser原始响应:", response);
+      
+      // 检查响应结构并提取用户数据
+      if (response.errorCode === "0" && response.data) {
+        const userData = response.data;
+        console.log("提取的用户数据:", userData);
+        
+        // 更新用户信息状态（持久化）
+        saveUserInfo(userData);
+        return userData;
+      } else {
+        throw new Error(response.errorMsg || "获取用户信息失败");
+      }
     } catch (error) {
       console.error("获取登录用户信息失败:", error);
       throw error;
+    }
+  };
+
+  // 检查并更新用户会员状态
+  const checkMemberStatus = async () => {
+    try {
+      if (!isLoggedIn.value) {
+        console.log("用户未登录，无法检查会员状态");
+        return false;
+      }
+
+      const userData = await getLoginUser();
+      console.log("会员状态检查结果:", userData);
+      
+      // 返回是否是会员 - 检查member字段是否不是BASIC
+      return userData?.member == 'BASIC';
+    } catch (error) {
+      console.error("检查会员状态失败:", error);
+      return false;
     }
   };
 
@@ -187,7 +285,7 @@ export const useAuth = () => {
   };
 
   // 初始化时检查登录状态
-  const initAuth = () => {
+  const initAuth = async () => {
     // 恢复用户信息
     restoreUserInfo();
 
@@ -195,7 +293,15 @@ export const useAuth = () => {
     if (isLoggedIn.value) {
       console.log("用户已登录，token 存在");
       if (!userInfo.value) {
-        console.warn("Token 存在但用户信息缺失，可能需要重新登录");
+        console.warn("Token 存在但用户信息缺失，重新获取用户信息");
+        try {
+          await getLoginUser();
+          console.log("重新获取用户信息成功");
+        } catch (error) {
+          console.error("重新获取用户信息失败:", error);
+        }
+      } else {
+        console.log("用户信息已存在:", userInfo.value);
       }
     } else {
       console.log("用户未登录");
@@ -209,14 +315,17 @@ export const useAuth = () => {
   return {
     // 状态
     isLoggedIn,
+    isMember,
     userInfo: readonly(userInfo), // 只读的用户信息
 
     // 方法
     login,
     register,
     getLoginUser,
+    checkMemberStatus,
     logout,
     initAuth,
+    debugTokenStatus,
 
     // 会话管理
     getLoginTime,

@@ -79,7 +79,7 @@
         <div
           v-for="course in filteredCourses"
           :key="course.id"
-          class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
+          class="bg-white shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
         >
           <!-- 课程封面 -->
           <div class="h-48 bg-gradient-to-br from-blue-400 to-purple-500 relative">
@@ -90,7 +90,7 @@
             <div class="absolute top-4 right-4">
               <span
                 :class="[
-                  'px-3 py-1 rounded-full text-xs font-medium',
+                  'px-3 py-1 text-xs font-medium',
                   course.status === 'developing' 
                     ? 'bg-green-100 text-green-800' 
                     : 'bg-yellow-100 text-yellow-800'
@@ -117,9 +117,9 @@
                 <span>开发进度</span>
                 <span>{{ course.progress }}%</span>
               </div>
-              <div class="w-full bg-gray-200 rounded-full h-2">
+              <div class="w-full bg-gray-200 h-2">
                 <div
-                  class="bg-green-500 h-2 rounded-full transition-all duration-300"
+                  class="bg-green-500 h-2 transition-all duration-300"
                   :style="{ width: `${course.progress}%` }"
                 ></div>
               </div>
@@ -130,7 +130,7 @@
               <span
                 v-for="tag in course.tags"
                 :key="tag"
-                class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded"
+                class="px-2 py-1 bg-gray-100 text-gray-700 text-xs"
               >
                 {{ tag }}
               </span>

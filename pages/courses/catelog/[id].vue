@@ -26,9 +26,10 @@
       </div>
       <div class="flex flex-col gap-2">
         <div
-          v-for="it in catalog"
+          v-for="(it, index) in catalog"
           :key="it.id"
           class="group relative flex items-center px-3 py-3 md:py-2 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer rounded"
+          @click="handleChapterClick(it, index)"
         >
           <div
             v-if="it.lock"
@@ -37,30 +38,49 @@
             <span class="truncate pr-2">{{ it.chaptersTitle }}</span>
             <LockIcon class="flex-shrink-0" />
           </div>
-          <NuxtLink
+          <div
             v-else
-            :to="`/courses/chapter/${it.id}`"
             class="flex items-center justify-between text-muted-foreground group-hover:text-primary transition-colors flex-1 text-sm md:text-base truncate"
           >
             <span class="truncate pr-2">{{ it.chaptersTitle }}</span>
-            <Badge variant="outline" class="ml-2">
-              试学
-            </Badge> 
-          </NuxtLink>
+            <!-- 如果用户是会员，不显示任何标签 -->
+            <template v-if="!isMember">
+              <Badge v-if="index < 2" variant="outline" class="ml-2">
+                试学
+              </Badge>
+              <Badge v-else variant="secondary" class="ml-2">
+                付费
+              </Badge>
+            </template>
+            <!-- 如果用户是会员，显示会员标签 -->
+            <!-- <Badge v-else variant="default" class="ml-2 bg-green-600 hover:bg-green-700">
+              会员
+            </Badge> -->
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- 支付弹窗组件 -->
+    <PaymentModal 
+      v-model:open="showPaymentModal"
+      @payment="handlePayment"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from "vue";
 import LockIcon from "~/components/courses/lockicon.vue";
+import PaymentModal from "~/components/courses/PaymentModal.vue";
 import { getCourseChapters } from "~/lib/api/modules/courses";
 // import { LockClosedIcon } from "lucide-vue-next";
+
 const courseId = useRoute().params.id;
+const { isLoggedIn, isMember, checkMemberStatus } = useAuth();
 
 const catalog = ref([]);
+const showPaymentModal = ref(false);
 
 // 设置页面标题
 useHead({
@@ -76,8 +96,62 @@ const getCourseChaptersData = async () => {
   }
 };
 
-onMounted(() => {
-  getCourseChaptersData();
+// 处理章节点击
+const handleChapterClick = async (chapter, index) => {
+  // 如果用户已登录且是会员，直接跳转
+  if (isLoggedIn.value && isMember.value) {
+    navigateTo(`/courses/chapter/${chapter.id}`);
+    return;
+  }
+
+  // 如果章节被锁定或不是前两集，显示会员支付弹窗
+  if (chapter.lock || index >= 2) {
+    showPaymentModal.value = true;
+  } else {
+    // 前两集免费试学，直接跳转
+    navigateTo(`/courses/chapter/${chapter.id}`);
+  }
+};
+
+// 处理会员支付
+const handlePayment = async (paymentInfo) => {
+  console.log('会员支付处理:', paymentInfo);
+  
+  if (paymentInfo.success) {
+    // 支付成功后的逻辑
+    console.log('订单ID:', paymentInfo.orderId);
+    
+    // 等待一段时间后检查会员状态（给后端处理时间）
+    setTimeout(async () => {
+      try {
+        const isMemberNow = await checkMemberStatus();
+        if (isMemberNow) {
+          alert('会员开通成功！现在可以访问所有课程内容了。');
+          // 可以重新获取课程数据以更新权限状态
+          // getCourseChaptersData();
+        } else {
+          console.log('会员状态尚未更新，可能需要等待一段时间');
+        }
+      } catch (error) {
+        console.error('检查会员状态失败:', error);
+      }
+    }, 2000); // 等待2秒后检查
+    
+    // 关闭支付弹窗
+    showPaymentModal.value = false;
+  } else {
+    // 支付失败的处理
+    console.error('支付失败:', paymentInfo);
+  }
+};
+
+onMounted(async () => {
+  await getCourseChaptersData();
+  
+  // 如果用户已登录，检查会员状态
+  if (isLoggedIn.value) {
+    await checkMemberStatus();
+  }
 });
 
 </script>

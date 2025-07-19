@@ -2,7 +2,7 @@ import { useApi } from '../index'
 
 // 认证相关类型定义
 export interface LoginParams {
-  username: string
+  email: string
   password: string
 }
 
@@ -25,8 +25,21 @@ export interface EmailVerificationResponse {
 
 export interface LoginUserResponse {
   id: string
-  username: string
+  userName: string
+  email: string
+  member: string
 }
+
+// API响应包装结构
+export interface ApiResponse<T> {
+  errorCode: string
+  errorMsg: string
+  data: T
+  requestId: string | null
+}
+
+// 用户信息API响应
+export interface GetLoginUserResponse extends ApiResponse<LoginUserResponse> {}
 
 // 登录响应数据结构
 export interface LoginResponse {
@@ -65,7 +78,7 @@ export const useAuthApi = () => {
     },
     // 获取登录用户信息
     getLoginUser: () => {
-      return api.get<LoginUserResponse>('/auth/getLoginUser')
+      return api.get<GetLoginUserResponse>('/auth/getLoginUser')
     },
     // 发送邮箱验证码
     sendEmailVerification: (data: EmailVerificationParams) => {

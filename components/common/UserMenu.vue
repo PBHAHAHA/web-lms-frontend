@@ -3,9 +3,9 @@
     <DropdownMenuTrigger asChild>
       <Button variant="ghost" class="flex items-center gap-2 px-3">
         <div class="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-xs text-primary-foreground">
-          {{ getUserInitial(userInfo?.username) }}
+          {{ getUserInitial(userInfo?.userName) }}
         </div>
-        <span class="text-sm text-foreground">{{ userInfo?.username || '用户' }}</span>
+        <span class="text-sm text-foreground">{{ userInfo?.userName || '用户' }}</span>
         <LucideChevronDown class="w-4 h-4 text-foreground/60" />
       </Button>
     </DropdownMenuTrigger>
@@ -13,10 +13,10 @@
       <DropdownMenuLabel>
         <div class="flex items-center gap-2">
           <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-sm text-primary-foreground">
-            {{ getUserInitial(userInfo?.username) }}
+            {{ getUserInitial(userInfo?.userName) }}
           </div>
           <div class="flex flex-col">
-            <span class="font-medium">{{ userInfo?.username || '用户' }}</span>
+            <span class="font-medium">{{ userInfo?.userName || '用户' }}</span>
             <!-- <span class="text-xs text-muted-foreground">在线学习</span> -->
           </div>
         </div>

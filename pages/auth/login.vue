@@ -158,8 +158,16 @@
       console.log(form, "登录数据3")
       const res = await login(form)
       console.log(res, "登录数据4")
-      let loginResponse = res.loginResponse
-      if(loginResponse.errorCode == 0){
+      
+      // 处理不同的返回结构
+      let loginResponse
+      if (res && 'loginResponse' in res) {
+        loginResponse = res.loginResponse
+      } else {
+        loginResponse = res
+      }
+      
+      if(loginResponse.errorCode == '0'){
         success.value = '登录成功！正在跳转...'
       }else{
         error.value = loginResponse.errorMsg
@@ -180,8 +188,25 @@
         sameSite: 'strict'
       })
       
-      userCookie.value = JSON.stringify(loginResponse.user)
-      tokenCookie.value = loginResponse.token
+      // 根据返回结构获取用户信息和token
+      if (res && 'userInfo' in res && 'token' in res) {
+        userCookie.value = JSON.stringify(res.userInfo)
+        tokenCookie.value = res.token
+      } else {
+        // 如果是直接返回的 LoginResponse，需要从 loginId 解析用户信息
+        if (loginResponse.data && loginResponse.data.loginId) {
+          try {
+            const userData = JSON.parse(loginResponse.data.loginId)
+            userCookie.value = JSON.stringify({
+              id: userData.id?.toString() || "",
+              username: userData.userName || "",
+            })
+          } catch (e) {
+            console.warn('解析用户信息失败:', e)
+          }
+        }
+        tokenCookie.value = loginResponse.data?.tokenValue || ''
+      }
       
       success.value = '登录成功！正在跳转...'
       
