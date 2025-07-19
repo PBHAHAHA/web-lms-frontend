@@ -132,8 +132,89 @@
             </div>
           </div>
         </div> -->
+
+        <!-- 开通会员卡片 - 仅非会员显示 -->
+        <div v-if="!isMember" class="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 p-6 shadow-sm border border-blue-200 dark:border-blue-800">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+              <LucideCrown class="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h2 class="text-xl font-semibold text-foreground">升级会员</h2>
+              <p class="text-sm text-muted-foreground">解锁所有课程内容</p>
+            </div>
+          </div>
+<!-- 
+          <div class="space-y-4 mb-6">
+            <div class="flex items-center gap-2 text-sm">
+              <LucideCheck class="w-4 h-4 text-green-500" />
+              <span>解锁所有课程章节</span>
+            </div>
+            <div class="flex items-center gap-2 text-sm">
+              <LucideCheck class="w-4 h-4 text-green-500" />
+              <span>专属学习资料下载</span>
+            </div>
+            <div class="flex items-center gap-2 text-sm">
+              <LucideCheck class="w-4 h-4 text-green-500" />
+              <span>一对一答疑服务</span>
+            </div>
+          </div>
+
+          <div class="text-center mb-4">
+            <div class="flex items-center justify-center gap-2 mb-2">
+              <span class="text-sm text-gray-500 line-through">¥299</span>
+              <span class="text-2xl font-bold text-red-600">¥199</span>
+            </div>
+            <p class="text-xs text-red-600">限时优惠，立省¥100</p>
+          </div> -->
+
+          <button 
+            @click="showPaymentModal = true"
+            class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-4 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-colors font-medium flex items-center justify-center gap-2"
+          >
+            <LucideCrown class="w-4 h-4" />
+            立即开通会员
+          </button>
+        </div>
+
+        <!-- 会员专享功能卡片 - 仅会员显示 -->
+        <div v-else class="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-6 shadow-sm border border-green-200 dark:border-green-800">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+              <LucideCrown class="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h2 class="text-xl font-semibold text-foreground">会员专享</h2>
+              <p class="text-sm text-muted-foreground">感谢您的支持</p>
+            </div>
+          </div>
+
+          <div class="space-y-4 mb-6">
+            <div class="flex items-center gap-2 text-sm text-green-600">
+              <LucideCheck class="w-4 h-4" />
+              <span>已解锁所有课程章节</span>
+            </div>
+            <div class="flex items-center gap-2 text-sm text-green-600">
+              <LucideCheck class="w-4 h-4" />
+              <span>专属学习资料下载</span>
+            </div>
+            <div class="flex items-center gap-2 text-sm text-green-600">
+              <LucideCheck class="w-4 h-4" />
+              <span>一对一答疑服务</span>
+            </div>
+          </div>
+
+          <div class="text-center">
+            <p class="text-sm text-green-600 font-medium">🎉 您已是尊贵的会员用户</p>
+          </div>
+        </div>
       </div>
 
+      <!-- 支付弹窗 -->
+      <PaymentModal 
+        v-model:open="showPaymentModal"
+        @payment="handlePayment"
+      />
     </div>
   </div>
 </template>
@@ -148,9 +229,12 @@ import {
   LucideSettings,
   LucideLogOut
 } from 'lucide-vue-next';
+import PaymentModal from '~/components/courses/PaymentModal.vue';
 import { useAuth } from '~/composables/useAuth';
 
-const { userInfo, isMember, getLoginDuration, logout } = useAuth();
+const { userInfo, isMember, getLoginDuration, logout, checkMemberStatus } = useAuth();
+
+const showPaymentModal = ref(false);
 
 // 页面元数据
 useHead({
@@ -202,6 +286,33 @@ const handleLogout = () => {
     
     // 跳转到登录页面
     navigateTo('/auth/login');
+  }
+};
+
+// 处理支付成功
+const handlePayment = async (paymentInfo) => {
+  console.log('会员支付处理:', paymentInfo);
+  
+  if (paymentInfo.success) {
+    // 等待一段时间后检查会员状态（给后端处理时间）
+    setTimeout(async () => {
+      try {
+        const isMemberNow = await checkMemberStatus();
+        if (isMemberNow) {
+          alert('会员开通成功！欢迎成为我们的会员！');
+        } else {
+          console.log('会员状态尚未更新，可能需要等待一段时间');
+        }
+      } catch (error) {
+        console.error('检查会员状态失败:', error);
+      }
+    }, 2000); // 等待2秒后检查
+    
+    // 关闭支付弹窗
+    showPaymentModal.value = false;
+  } else {
+    // 支付失败的处理
+    console.error('支付失败:', paymentInfo);
   }
 };
 

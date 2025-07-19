@@ -17,11 +17,27 @@
         >
           <LucideMenu class="size-5" />
         </button>
-        <div v-if="loading" class="flex justify-center py-8">
-          <div class="text-muted-foreground">加载中...</div>
+        
+        <!-- 内容区域 - 添加淡入淡出过渡 -->
+        <div class="relative">
+          <Transition
+            name="fade"
+            mode="out-in"
+          >
+            <div v-if="loading" key="loading" class="flex justify-center py-8">
+              <div class="text-muted-foreground">加载中...</div>
+            </div>
+            <EditorRenderer 
+              v-else-if="content" 
+              key="content"
+              :content="content" 
+              class="fade-enter-active"
+            />
+            <div v-else key="empty" class="text-center py-8 text-muted-foreground">
+              暂无内容
+            </div>
+          </Transition>
         </div>
-        <EditorRenderer v-else-if="content" :content="content" />
-        <div v-else class="text-center py-8 text-muted-foreground">暂无内容</div>
       </div>
     </div>
   </div>
@@ -38,6 +54,8 @@ import {
 
 const route = useRoute();
 const router = useRouter();
+const { isMember, isLoggedIn, checkMemberStatus } = useAuth();
+
 const id = route.params.id;
 const courseId = 1; // 假设课程ID
 
@@ -45,12 +63,36 @@ const chapters = ref([]);
 const visible = ref(true);
 const content = ref("");
 const loading = ref(true);
+const currentChapterIndex = ref(-1);
 
 // 方法
 const toggleNav = () => {
   visible.value = !visible.value;
 };
 
+// 检查当前章节权限
+const checkChapterPermission = async () => {
+  // 只有在章节列表为空时才获取
+  if (chapters.value.length === 0) {
+    await getCourseChaptersData();
+  }
+  
+  // 找到当前章节的索引
+  const chapterIndex = chapters.value.findIndex(chapter => chapter.id == id);
+  currentChapterIndex.value = chapterIndex;
+  
+  console.log('当前章节索引:', chapterIndex, '是否会员:', isMember.value);
+  
+  // 如果是第三章及之后的章节（索引 >= 2），且用户不是会员
+  if (chapterIndex >= 2 && !isMember.value) {
+    console.log('无权限访问该章节，重定向到课程目录');
+    // 重定向到课程目录页面
+    await navigateTo(`/courses/catelog/${courseId}`);
+    return false;
+  }
+  
+  return true;
+};
 
 const getCourseChaptersData = async () => {
   try {
@@ -63,18 +105,20 @@ const getCourseChaptersData = async () => {
     console.error("获取章节列表失败:", error);
     // 使用模拟数据
     chapters.value = [
-      { id: 1, title: "课程介绍与环境搭建" },
-      { id: 2, title: "前端基础：Vue 3 + TypeScript" },
-      { id: 3, title: "后端开发：Node.js + Express" },
-      { id: 4, title: "数据库设计与操作" },
-      { id: 5, title: "项目实战与部署" },
+      { id: 1, chaptersTitle: "课程介绍与环境搭建" },
+      { id: 2, chaptersTitle: "前端基础：Vue 3 + TypeScript" },
+      { id: 3, chaptersTitle: "后端开发：Node.js + Express" },
+      { id: 4, chaptersTitle: "数据库设计与操作" },
+      { id: 5, chaptersTitle: "项目实战与部署" },
     ];
   }
 };
 
-const getChapterContentFunc = async () => {
+const getChapterContentFunc = async (showLoading = true) => {
   try {
-    loading.value = true;
+    if (showLoading) {
+      loading.value = true;
+    }
     const res = await getChapterContent({ id });
     console.log(res, "res");
     if (
@@ -91,7 +135,9 @@ const getChapterContentFunc = async () => {
     console.error("获取章节内容失败:", error);
     content.value = "";
   } finally {
-    loading.value = false;
+    if (showLoading) {
+      loading.value = false;
+    }
   }
 };
 
@@ -99,14 +145,52 @@ definePageMeta({
   layout: "chapter",
 });
 
-onMounted(() => {
-  getCourseChaptersData();
-  getChapterContentFunc();
+onMounted(async () => {
+  // 如果用户已登录，先检查会员状态
+  if (isLoggedIn.value) {
+    await checkMemberStatus();
+  }
+  
+  // 检查章节权限
+  const hasPermission = await checkChapterPermission();
+  
+  // 只有有权限时才加载内容
+  if (hasPermission) {
+    await getChapterContentFunc(true);
+  }
+});
+
+// 监听路由变化，重新检查权限
+watch(() => route.params.id, async (newId, oldId) => {
+  if (newId && newId !== oldId) {
+    // 路由切换时不显示loading，避免闪烁
+    const hasPermission = await checkChapterPermission();
+    if (hasPermission) {
+      // 平滑切换内容，不显示loading状态
+      await getChapterContentFunc(false);
+    }
+  }
 });
 </script>
 
 <style scoped>
 .left-76 {
   left: 19rem; /* 304px - 导航宽度(288px) + 原始left(16px) */
+}
+
+/* 淡入淡出过渡效果 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease-in-out;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.fade-enter-to,
+.fade-leave-from {
+  opacity: 1;
 }
 </style>
