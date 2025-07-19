@@ -170,7 +170,7 @@
 
           <button 
             @click="showPaymentModal = true"
-            class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-4 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-colors font-medium flex items-center justify-center gap-2"
+            class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-4 hover:from-blue-600 hover:to-purple-700 transition-colors font-medium flex items-center justify-center gap-2"
           >
             <LucideCrown class="w-4 h-4" />
             立即开通会员
