@@ -5,7 +5,7 @@
       <div class="flex flex-col md:flex-row gap-4">
         <div class="w-full md:w-48 md:h-32 relative bg-gray-100 dark:bg-gray-800 rounded overflow-hidden">
           <img 
-            :src="courseInfo?.img || '/images/javamain.png'" 
+            :src="courseInfo?.img || ''" 
             :alt="courseInfo?.title || '课程封面'" 
             class="w-full h-full object-cover transition-opacity duration-300"
             :class="{ 'opacity-0': imageError }"
