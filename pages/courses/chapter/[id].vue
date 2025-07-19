@@ -97,19 +97,17 @@ const checkChapterPermission = async () => {
 const getCourseChaptersData = async () => {
   try {
     const res = await getCourseChapters({ id: courseId });
-    console.log(res, "chapters res");
-    if (res.errorCode == 0) {
-      chapters.value = res.data || [];
+    console.log(res, "章节数据");
+    if (res.errorCode === "0" && res.data?.chapters) {
+      chapters.value = res.data.chapters || [];
     }
   } catch (error) {
     console.error("获取章节列表失败:", error);
     // 使用模拟数据
     chapters.value = [
-      { id: 1, chaptersTitle: "课程介绍与环境搭建" },
-      { id: 2, chaptersTitle: "前端基础：Vue 3 + TypeScript" },
-      { id: 3, chaptersTitle: "后端开发：Node.js + Express" },
-      { id: 4, chaptersTitle: "数据库设计与操作" },
-      { id: 5, chaptersTitle: "项目实战与部署" },
+      { id: 1, chaptersTitle: "1. 从0开始搭建项目" },
+      { id: 2, chaptersTitle: "2. 基础项目技术" },
+      { id: 3, chaptersTitle: "3. 实现课程的增删改查" },
     ];
   }
 };
