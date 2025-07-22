@@ -25,10 +25,10 @@
         </div>
         <div class="flex-1">
           <h2 class="text-xl md:text-2xl font-bold mb-2">
-            {{ courseInfo?.title || '全栈开发实战：从零到一构建现代Web应用' }}
+            {{ courseInfo?.title || '' }}
           </h2>
           <p class="text-sm text-muted-foreground leading-relaxed">
-            {{ courseInfo?.described || '本课程将带你从基础开始，逐步掌握现代Web开发的核心技术栈，包括前端框架、后端API、数据库设计等，通过实际项目练习，让你具备独立开发完整Web应用的能力。' }}
+            {{ courseInfo?.described || '' }}
           </p>
           <!-- 课程标签 -->
           <div v-if="courseInfo?.tag?.length" class="flex gap-2 mt-3">

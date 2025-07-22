@@ -15,26 +15,9 @@
     </template>
     <div
       v-else
-      class="w-full h-full flex flex-col items-center justify-center bg-gray-100"
+      class="w-full h-full flex flex-col items-center justify-center bg-black text-white"
     >
-      <div class="text-4xl text-gray-300 mb-2">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="48"
-          height="48"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-          <circle cx="8.5" cy="8.5" r="1.5"></circle>
-          <polyline points="21 15 16 10 5 21"></polyline>
-        </svg>
-      </div>
-      <p class="text-gray-300 text-sm"></p>
+      <h3 class="text-lg font-semibold text-center px-4">{{ course.title || '课程标题' }}</h3>
       <div
         v-if="course.hot"
         class="absolute top-2 right-2 bg-primary text-primary-foreground px-2 py-1 text-xs rounded"
@@ -50,7 +33,7 @@
     <Skeleton v-else class="h-6 w-3/4 mb-2" />
 
     <template v-if="course.described">
-      <p class="text-muted-foreground text-sm mb-4">{{ course.described }}</p>
+      <p class="h-15 text-muted-foreground text-sm mb-4 line-clamp-3">{{ course.described }}</p>
     </template>
     <Skeleton v-else class="h-4 w-full mb-4" />
     <div class="flex flex-wrap gap-2 mb-4">
@@ -66,8 +49,8 @@
       <Badge
         v-for="tag in course.tag"
         v-if="course.tag"
-        variant="outline"
-        class="text-xs"
+        variant="primary"
+        class="text-xs bg-primary border-none text-primary-foreground"
       >
         {{ tag }}
       </Badge>
