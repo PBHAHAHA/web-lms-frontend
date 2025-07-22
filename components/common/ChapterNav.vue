@@ -69,6 +69,7 @@
 import Logo from '~/components/common/Logo.vue';
 import PaymentModal from '~/components/courses/PaymentModal.vue';
 import { LucideLock } from 'lucide-vue-next';
+import { useAuth } from '~/composables/useAuth';
 
 const route = useRoute();
 const { isMember, checkMemberStatus } = useAuth();

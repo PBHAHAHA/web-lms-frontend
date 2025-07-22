@@ -25,7 +25,8 @@
 
 <script setup>
 import EditorRenderer from "~/components/editor/editor-renderer.vue";
-import { getChapterContent } from "~/lib/api/modules/courses";
+import { getChapterContent, getCourseChapters } from "~/lib/api/modules/courses";
+import { useAuth } from "~/composables/useAuth";
 
 const route = useRoute();
 const { isMember, isLoggedIn, checkMemberStatus } = useAuth();
@@ -67,21 +68,43 @@ const getChapterContentFunc = async (showLoading = true) => {
 
 // 检查当前章节权限
 const checkChapterPermission = async () => {
-  // 这里我们可以从布局中获取章节数据，或者单独检查权限
-  // 暂时简化权限检查逻辑
-  const chapterIndex = parseInt(id) - 1; // 假设章节ID是连续的数字
-  
-  console.log('当前章节索引:', chapterIndex, '是否会员:', isMember.value);
-  
-  // 如果是第三章及之后的章节（索引 >= 2），且用户不是会员
-  if (chapterIndex >= 2 && !isMember.value) {
-    console.log('无权限访问该章节，重定向到课程目录');
-    // 重定向到课程目录页面
-    await navigateTo(`/courses/catelog/${courseId.value}`);
-    return false;
+  try {
+    // 获取课程章节数据来确定当前章节的索引
+    const res = await getCourseChapters({ id: courseId.value });
+    if (res.errorCode === "0" && res.data?.chapters) {
+      const chapters = res.data.chapters || [];
+      // 找到当前章节在章节列表中的索引
+      const chapterIndex = chapters.findIndex(chapter => chapter.id == id);
+      
+      console.log('当前章节ID:', id, '章节索引:', chapterIndex, '是否已登录:', isLoggedIn.value, '是否会员:', isMember.value);
+      
+      // 前两章（索引 0 和 1）任何人都可以访问
+      if (chapterIndex < 2) {
+        console.log('前两章免费试学，允许访问');
+        return true;
+      }
+      
+      // 第三章及之后需要会员权限
+      if (chapterIndex >= 2) {
+        if (isLoggedIn.value && isMember.value) {
+          console.log('已登录会员，允许访问付费章节');
+          return true;
+        } else {
+          console.log('无权限访问该章节，重定向到课程目录');
+          await navigateTo(`/courses/catelog/${courseId.value}`);
+          return false;
+        }
+      }
+    }
+    
+    // 如果找不到章节，默认允许访问（避免阻断）
+    console.log('未找到章节信息，默认允许访问');
+    return true;
+  } catch (error) {
+    console.error('检查章节权限时出错:', error);
+    // 出错时默认允许访问，避免阻断用户
+    return true;
   }
-  
-  return true;
 };
 
 definePageMeta({

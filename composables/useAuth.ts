@@ -270,7 +270,17 @@ export const useAuth = () => {
   };
 
   // 登出
-  const logout = (redirect = true) => {
+  const logout = async (redirect = true) => {
+    try {
+      // 先调用退出登录API
+      console.log("调用退出登录API...");
+      await authApi.logout();
+      console.log("退出登录API调用成功");
+    } catch (error) {
+      console.error("调用退出登录API失败:", error);
+      // 即使API调用失败，也继续清除本地状态
+    }
+
     // 清除认证相关的 cookie
     const authCookie = useCookie("authorized-token");
     const tokenName = useCookie("token-name");
@@ -290,9 +300,29 @@ export const useAuth = () => {
   };
 
   // 处理登录失效
-  const handleAuthExpired = () => {
+  const handleAuthExpired = async () => {
     console.warn("检测到登录失效，清除认证信息并跳转到登录页");
-    logout(true); // 自动跳转到登录页
+    // 登录失效时不需要调用退出API，直接清除本地状态
+    try {
+      // 清除认证相关的 cookie
+      const authCookie = useCookie("authorized-token");
+      const tokenName = useCookie("token-name");
+
+      authCookie.value = null;
+      tokenName.value = null;
+
+      // 清除用户信息（包括 localStorage）
+      saveUserInfo(null);
+
+      console.log("登录失效处理完成，已清除所有认证信息");
+      
+      // 跳转到登录页
+      if (process.client) {
+        navigateTo('/auth/login');
+      }
+    } catch (error) {
+      console.error("处理登录失效时出错:", error);
+    }
   };
 
   // 初始化时检查登录状态

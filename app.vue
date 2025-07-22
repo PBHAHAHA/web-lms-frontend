@@ -7,6 +7,8 @@
 </template>
 
 <script setup>
+import { useAuth } from '~/composables/useAuth';
+
 // 全局认证状态管理
 const { initAuth } = useAuth();
 

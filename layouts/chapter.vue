@@ -30,6 +30,7 @@
 import ChapterNav from "~/components/common/ChapterNav.vue";
 import { LucideMenu } from "lucide-vue-next";
 import { getCourseChapters } from "~/lib/api/modules/courses";
+import { useAuth } from "~/composables/useAuth";
 
 const route = useRoute();
 const { isMember, isLoggedIn, checkMemberStatus } = useAuth();

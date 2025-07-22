@@ -83,6 +83,10 @@ export const useAuthApi = () => {
     // 发送邮箱验证码
     sendEmailVerification: (data: EmailVerificationParams) => {
       return api.post<EmailVerificationResponse>('/auth/verificationEmail', data)
+    },
+    // 退出登录
+    logout: () => {
+      return api.post<ApiResponse<any>>('/auth/loginOut')
     }
   }
 }

@@ -270,22 +270,25 @@ const getMemberStatusText = () => {
 };
 
 // 处理退出登录
-const handleLogout = () => {
+const handleLogout = async () => {
   if (confirm('确定要退出登录吗？')) {
-    // 调用useAuth的logout清理认证状态和cookie
-    logout();
-    
-    // 清空可能的遗留cookie（登录页面设置的）
-    const userCookie = useCookie('user');
-    const authTokenCookie = useCookie('auth-token');
-    
-    if (userCookie.value) userCookie.value = null;
-    if (authTokenCookie.value) authTokenCookie.value = null;
-    
-    console.log('退出登录成功，已清空所有认证信息');
-    
-    // 跳转到登录页面
-    navigateTo('/auth/login');
+    try {
+      // 调用useAuth的logout清理认证状态和cookie (现在是异步的)
+      await logout();
+      
+      // 清空可能的遗留cookie（登录页面设置的）
+      const userCookie = useCookie('user');
+      const authTokenCookie = useCookie('auth-token');
+      
+      if (userCookie.value) userCookie.value = null;
+      if (authTokenCookie.value) authTokenCookie.value = null;
+      
+      console.log('退出登录成功，已清空所有认证信息');
+      
+      // 注意：logout函数已经会自动跳转到登录页，这里不需要重复跳转
+    } catch (error) {
+      console.error('退出登录失败:', error);
+    }
   }
 };
 
