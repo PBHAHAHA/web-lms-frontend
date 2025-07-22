@@ -155,7 +155,7 @@ const getCourseChaptersData = async () => {
 const handleChapterClick = async (chapter, index) => {
   // 如果用户已登录且是会员，直接跳转
   if (isLoggedIn.value && isMember.value) {
-    navigateTo(`/courses/chapter/${chapter.id}`);
+    navigateTo(`/courses/chapter/${chapter.id}?courseId=${courseId}`);
     return;
   }
 
@@ -164,7 +164,7 @@ const handleChapterClick = async (chapter, index) => {
     showPaymentModal.value = true;
   } else {
     // 前两集免费试学，直接跳转
-    navigateTo(`/courses/chapter/${chapter.id}`);
+    navigateTo(`/courses/chapter/${chapter.id}?courseId=${courseId}`);
   }
 };
 

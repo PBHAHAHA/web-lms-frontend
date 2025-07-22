@@ -270,7 +270,7 @@ export const useAuth = () => {
   };
 
   // 登出
-  const logout = () => {
+  const logout = (redirect = true) => {
     // 清除认证相关的 cookie
     const authCookie = useCookie("authorized-token");
     const tokenName = useCookie("token-name");
@@ -282,6 +282,17 @@ export const useAuth = () => {
     saveUserInfo(null);
 
     console.log("用户已登出，已清除所有认证信息");
+    
+    // 可选择是否跳转到登录页
+    if (redirect && process.client) {
+      navigateTo('/auth/login');
+    }
+  };
+
+  // 处理登录失效
+  const handleAuthExpired = () => {
+    console.warn("检测到登录失效，清除认证信息并跳转到登录页");
+    logout(true); // 自动跳转到登录页
   };
 
   // 初始化时检查登录状态
@@ -326,6 +337,7 @@ export const useAuth = () => {
     logout,
     initAuth,
     debugTokenStatus,
+    handleAuthExpired,
 
     // 会话管理
     getLoginTime,
