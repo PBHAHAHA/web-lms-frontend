@@ -56,7 +56,7 @@
 
 <script setup>
 import { LucideChevronDown, LucideUser, LucideBook, LucideSettings, LucideLogOut } from 'lucide-vue-next';
-import { useAuth } from '~/composables/useAuth';
+// import { useAuth } from '~/composables/useAuth';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -65,6 +65,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
+import { useAuth } from '~/composables/useAuth';
 
 const { userInfo, logout } = useAuth();
 
@@ -77,11 +78,10 @@ const getUserInitial = (username) => {
 // 处理登出
 const handleLogout = async () => {
   try {
-    // 调用登出方法
-    logout();
+    // 调用登出方法 (现在是异步的)
+    await logout();
     
-    // 跳转到首页
-    await navigateTo('/');
+    // 注意：logout函数已经会自动跳转到登录页，这里不需要再跳转
   } catch (error) {
     console.error('登出失败:', error);
   }

@@ -20,16 +20,24 @@
         <!-- 章节列表 -->
          <div v-for="(chapter, index) in chapters" :key="chapter.id" class="relative">  
           <!-- 会员用户或前两章：可以点击 -->
-          <NuxtLink 
+          <div 
             v-if="isMember || index < 2"
-            :to="`/courses/chapter/${chapter.id}`" 
-            class="flex items-center justify-between px-3 py-2 text-sm text-foreground hover:bg-muted hover:text-foreground/90 rounded-md transition-colors"
+            @click="handleChapterClick(chapter, index)"
+            class="flex items-center justify-between px-3 py-2 text-sm rounded-md cursor-pointer transition-colors"
+            :class="{
+              'bg-primary text-primary-foreground': isCurrentChapter(chapter.id),
+              'text-foreground hover:bg-muted hover:text-foreground/90': !isCurrentChapter(chapter.id)
+            }"
           > 
             <span>{{ chapter.chaptersTitle }}</span>
-            <Badge v-if="!isMember && index < 2" variant="outline" class="text-xs">
+            <Badge 
+              v-if="!isMember && index < 2" 
+              :variant="isCurrentChapter(chapter.id) ? 'secondary' : 'outline'" 
+              class="text-xs"
+            >
               试学
             </Badge>
-          </NuxtLink>
+          </div>
           
           <!-- 非会员用户且第三章之后：显示锁定状态 -->
           <div 
@@ -61,9 +69,13 @@
 import Logo from '~/components/common/Logo.vue';
 import PaymentModal from '~/components/courses/PaymentModal.vue';
 import { LucideLock } from 'lucide-vue-next';
+import { useAuth } from '~/composables/useAuth';
 
 const route = useRoute();
 const { isMember, checkMemberStatus } = useAuth();
+
+// 从路由查询参数获取课程ID
+const courseId = computed(() => route.query.courseId);
 
 const props = defineProps({
   visible: {
@@ -73,6 +85,11 @@ const props = defineProps({
   chapters: {
     type: Array,
     default: () => []
+  },
+  // 添加当前章节ID属性
+  currentChapterId: {
+    type: [String, Number],
+    default: null
   }
 });
 
@@ -83,6 +100,23 @@ const chapters = computed(() => {
   console.log(props.chapters, "props.chapters");
   return props.chapters;
 });
+
+// 处理章节点击（避免页面刷新）
+const handleChapterClick = async (chapter, index) => {
+  // 检查权限
+  if (!isMember.value && index >= 2) {
+    handleLockedChapterClick(chapter);
+    return;
+  }
+  
+  // 使用路由导航，避免页面刷新
+  await navigateTo(`/courses/chapter/${chapter.id}?courseId=${courseId.value}`);
+};
+
+// 检查是否为当前章节
+const isCurrentChapter = (chapterId) => {
+  return String(chapterId) === String(props.currentChapterId);
+};
 
 // 处理锁定章节点击
 const handleLockedChapterClick = (chapter) => {
@@ -105,7 +139,7 @@ const handlePayment = async (paymentInfo) => {
           
           // 如果用户想要访问的章节现在可以访问了，自动跳转
           if (selectedChapter.value) {
-            navigateTo(`/courses/chapter/${selectedChapter.value.id}`);
+            navigateTo(`/courses/chapter/${selectedChapter.value.id}?courseId=${courseId.value}`);
           }
         } else {
           console.log('会员状态尚未更新，可能需要等待一段时间');

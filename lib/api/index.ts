@@ -56,6 +56,37 @@ export const createRequest = (config: RequestConfig = {}) => {
 
   // 响应拦截器
   const responseInterceptor = (response: any) => {
+    // 检查登录失效
+    if (response && response.errorMsg === "登录失效") {
+      console.warn("检测到登录失效，清除认证信息并跳转到登录页");
+      
+      // 在客户端环境下处理登录失效
+      if (process.client) {
+        try {
+          // 清除认证相关的cookie
+          const authToken = useCookie("authorized-token");
+          const tokenName = useCookie("token-name");
+          authToken.value = null;
+          tokenName.value = null;
+          
+          // 清除localStorage中的用户信息
+          if (typeof localStorage !== 'undefined') {
+            localStorage.removeItem('user-info');
+            localStorage.removeItem('login-time');
+            localStorage.removeItem('token-info');
+          }
+          
+          // 跳转到登录页
+          navigateTo('/auth/login');
+        } catch (error) {
+          console.error("处理登录失效时出错:", error);
+        }
+      }
+      
+      // 抛出错误以阻止后续处理
+      throw new Error("登录失效");
+    }
+    
     // 去除转义，直接返回响应数据
     if (response && typeof response === "object") {
       return response;
@@ -67,11 +98,37 @@ export const createRequest = (config: RequestConfig = {}) => {
   // 错误处理
   const errorHandler = (error: ApiError) => {
     console.error("API请求错误:", error);
+    
+    // 检查是否是网络错误中的登录失效
+    if (error.response?.data && error.response.data.errorCode === "-1") {
+      console.warn("从错误中检测到登录失效");
+      // 触发和响应拦截器相同的处理逻辑
+      if (process.client) {
+        try {
+          const authToken = useCookie("authorized-token");
+          const tokenName = useCookie("token-name");
+          authToken.value = null;
+          tokenName.value = null;
+          
+          if (typeof localStorage !== 'undefined') {
+            localStorage.removeItem('user-info');
+            localStorage.removeItem('login-time');
+            localStorage.removeItem('token-info');
+          }
+          
+          navigateTo('/auth/login');
+        } catch (clearError) {
+          console.error("清除认证信息失败:", clearError);
+        }
+      }
+    }
+    
     // 统一错误处理
     if (error.response?.status === 401) {
-      // 处理未授权
-      //   navigateTo('/login')
+      console.warn("检测到401未授权错误");
+      // 可能也需要处理登录失效
     }
+    
     throw error;
   };
 

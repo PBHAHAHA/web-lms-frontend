@@ -88,6 +88,7 @@ import { ref, computed } from "vue";
 import LockIcon from "~/components/courses/lockicon.vue";
 import PaymentModal from "~/components/courses/PaymentModal.vue";
 import { getCourseChapters } from "~/lib/api/modules/courses";
+import { useAuth } from "~/composables/useAuth";
 
 const courseId = useRoute().params.id;
 const { isLoggedIn, isMember, checkMemberStatus } = useAuth();
@@ -153,18 +154,19 @@ const getCourseChaptersData = async () => {
 
 // 处理章节点击
 const handleChapterClick = async (chapter, index) => {
-  // 如果用户已登录且是会员，直接跳转
-  if (isLoggedIn.value && isMember.value) {
-    navigateTo(`/courses/chapter/${chapter.id}`);
+  // 前两章免费试学，任何人都可以访问
+  if (index < 2) {
+    navigateTo(`/courses/chapter/${chapter.id}?courseId=${courseId}`);
     return;
   }
 
-  // 如果不是前两集，显示会员支付弹窗
-  if (index >= 2) {
-    showPaymentModal.value = true;
+  // 第三章及之后需要会员权限
+  if (isLoggedIn.value && isMember.value) {
+    // 已登录且是会员，直接跳转
+    navigateTo(`/courses/chapter/${chapter.id}?courseId=${courseId}`);
   } else {
-    // 前两集免费试学，直接跳转
-    navigateTo(`/courses/chapter/${chapter.id}`);
+    // 未登录或非会员，显示支付弹窗
+    showPaymentModal.value = true;
   }
 };
 

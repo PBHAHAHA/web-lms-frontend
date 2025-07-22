@@ -10,16 +10,16 @@ export default defineNuxtConfig({
     plugins: [
       tailwindcss(),
     ],
-    server: {
-      proxy: {
-        '/api': {
-          target: 'http://www.clothesinclothes.xyz:8888',
-          changeOrigin: true,
-          // secure: false, // 如果目标服务器使用自签名证书
-          // rewrite: (path) => path.replace(/^\/api/, ''),
-        }
-      }
-    }
+    // server: {
+    //   proxy: {
+    //     '/api': {
+    //       target: 'http://www.clothesinclothes.xyz:8888',
+    //       changeOrigin: true,
+    //       // secure: false, // 如果目标服务器使用自签名证书
+    //       // rewrite: (path) => path.replace(/^\/api/, ''),
+    //     }
+    //   }
+    // }
   },
   modules: ['shadcn-nuxt'],
   shadcn: {
