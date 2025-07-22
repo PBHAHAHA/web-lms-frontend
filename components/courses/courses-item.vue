@@ -33,7 +33,7 @@
     <Skeleton v-else class="h-6 w-3/4 mb-2" />
 
     <template v-if="course.described">
-      <p class="h-15 text-muted-foreground text-sm mb-4 line-clamp-3">{{ course.described }}</p>
+      <p class="h-15 text-muted-foreground text-sm mb-4 line-clamp-3" v-html="course.described"></p>
     </template>
     <Skeleton v-else class="h-4 w-full mb-4" />
     <div class="flex flex-wrap gap-2 mb-4">
