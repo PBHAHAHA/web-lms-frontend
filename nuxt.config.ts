@@ -6,6 +6,23 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ['~/assets/css/tailwind.css'],
 
+  // 添加51.la统计代码
+  app: {
+    head: {
+      script: [
+        {
+          // charset: 'UTF-8',
+          id: 'LA_COLLECT',
+          src: '//sdk.51.la/js-sdk-pro.min.js'
+        },
+        {
+          innerHTML: 'LA.init({id:"3Mt5bbVconlDOgRi",ck:"3Mt5bbVconlDOgRi"})',
+          type: 'text/javascript'
+        }
+      ]
+    }
+  },
+
   vite: {
     plugins: [
       tailwindcss(),
